@@ -11,13 +11,14 @@ function App() {
     setUnicorns(storedUnicorns);
   }, []);
 
+  // Agregar unicornio a la lista y guardar en localStorage
   const handleAddUnicorn = (newUnicorn) => {
     const updatedUnicorns = [...unicorns, newUnicorn];
-    localStorage.setItem("unicorns", JSON.stringify(updatedUnicorns));
     setUnicorns(updatedUnicorns);
+    localStorage.setItem("unicorns", JSON.stringify(updatedUnicorns));
   };
 
-  // ✅ FUNCIÓN EXPORTAR A PDF
+  // Exportar lista a PDF
   const handleExportToPDF = () => {
     const doc = new jsPDF();
     doc.text("Lista de Unicornios", 14, 10);
@@ -37,6 +38,14 @@ function App() {
     });
 
     doc.save("unicornios.pdf");
+  };
+
+  // Borrar toda la lista con confirmación
+  const handleClearList = () => {
+    if (window.confirm("¿Estás seguro de que deseas borrar todos los unicornios?")) {
+      setUnicorns([]);
+      localStorage.removeItem("unicorns");
+    }
   };
 
   return (
@@ -71,25 +80,23 @@ function App() {
               </tbody>
             </table>
 
-            <button onClick={handleExportToPDF} style={{ padding: "10px 20px", cursor: "pointer" }}>
+            <button
+              onClick={handleExportToPDF}
+              style={{ padding: "10px 20px", cursor: "pointer", marginRight: "10px" }}
+            >
               Exportar a PDF
+            </button>
+
+            <button
+              onClick={handleClearList}
+              style={{ padding: "10px 20px", backgroundColor: "#e74c3c", color: "white", cursor: "pointer" }}
+            >
+              Borrar Lista
             </button>
           </>
         )}
       </div>
-       <button
-      onClick={() => {
-        if (window.confirm("¿Estás seguro de que deseas borrar todos los unicornios?")) {
-          localStorage.removeItem("unicorns");
-          setUnicorns([]);
-        }
-      }}
-      style={{ padding: "10px 20px", backgroundColor: "#e74c3c", color: "white", cursor: "pointer" }}
-    >
-      Borrar Lista
-    </button>
-  </div>
-   
+    </div>
   );
 }
 

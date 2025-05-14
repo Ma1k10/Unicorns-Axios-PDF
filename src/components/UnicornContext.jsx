@@ -1,9 +1,24 @@
-import react from "react";
+import React, { createContext, useState, useEffect } from "react";
+import axios from "axios";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-const UnicornsContext = ({ unicorns }) => {
-  
+export const UnicornContext = createContext();
+
+export const UnicornProvider = ({ children }) => {
+  const [unicorns, setUnicorns] = useState([]);
+
+  // Cargar unicornios desde API con axios
+  const getUnicorns = async () => {
+    try {
+      const response = await axios.get("/api/unicorns"); // Cambiar URL a la correcta
+      setUnicorns(response.data);
+    } catch (error) {
+      console.error("Error al cargar unicornios:", error);
+    }
+  };
+
+  // Exportar a PDF
   const exportToPDF = () => {
     const doc = new jsPDF();
     const tableColumn = ["Nombre", "Color", "Poder", "Edad"];
@@ -14,44 +29,22 @@ const UnicornsContext = ({ unicorns }) => {
       unicorn.edad,
     ]);
 
-    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+    });
     doc.text("Listado de Unicornios", 14, 15);
     doc.save("unicorns-list.pdf");
   };
 
+  useEffect(() => {
+    getUnicorns();
+  }, []);
+
   return (
-    <div>
-      <h2>Lista de Unicornios</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Color</th>
-            <th>Poder</th>
-            <th>Edad</th>
-          </tr>
-        </thead>
-        <tbody>
-          {unicorns.length > 0 ? (
-            unicorns.map((unicorn, index) => (
-              <tr key={index}>
-                <td>{unicorn.nombre}</td>
-                <td>{unicorn.color}</td>
-                <td>{unicorn.poder}</td>
-                <td>{unicorn.edad}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4">No hay unicornios disponibles</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-      <button onClick={exportToPDF}>Exportar PDF</button>
-    </div>
-    
+    <UnicornContext.Provider value={{ unicorns, exportToPDF }}>
+      {children}
+    </UnicornContext.Provider>
   );
 };
-
-export default UnicornsContext;

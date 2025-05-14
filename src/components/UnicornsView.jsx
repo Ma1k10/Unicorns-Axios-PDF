@@ -9,8 +9,13 @@ const UnicornsView = ({ onAddUnicorn }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (!nombre || !color || !poder || !edad) {
+      alert("Por favor completa todos los campos");
+      return;
+    }
+
     const newUnicorn = { nombre, color, poder, edad };
-    onAddUnicorn(newUnicorn);  // Llamar la función para agregar el unicornio
+    onAddUnicorn(newUnicorn);
 
     setNombre("");
     setColor("");
